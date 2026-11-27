@@ -9,9 +9,6 @@ Go 单体后端 + 内嵌 Next.js 前端 + PostgreSQL，一条命令启动，浏�
 构建    Windows · Linux(amd64/arm64) · macOS(arm64)
 形态    单二进制（前端静态资源内嵌）
 ```
-
-文档：[开发指南](DEVELOPMENT.md) · [二开分支说明](README-FORK.md) · [源码包说明](README-源码包说明.md) · [在线激活服务器部署](deploy/actserver/README.md) · [部署说明](部署说明.txt)
-
 ---
 
 ## 一、它是什么
