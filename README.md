@@ -1,3 +1,7 @@
+## 一键安装
+
+curl -fsSL https://raw.githubusercontent.com/jianmo0x00/darkin-releases/main/install.sh | sudo bash
+
 # DARKIN — AI 自主渗透测试系统
 
 从外网侦察到内网纵深的自主渗透平台。给定目标后由 AI Agent 自行完成
