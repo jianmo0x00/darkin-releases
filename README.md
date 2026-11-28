@@ -156,7 +156,6 @@ createdb artex
 3. **激活授权** → 粘贴购买得到的 voucher 码（`DARKIN-XXXXX-XXXXX-...`）
 
 激活会自动绑定本机设备（一机一码），换取离线 license，之后无网也能用。
-在线激活服务器：`https://artex.darkin.ai`（内置默认，无需配置）。
 
 进入控制台后在「API KEY 配置」里填入 LLM Key（内置 Drink Ai / NodeDog /
 DeepSeek / OpenRouter 等预设）。
