@@ -1,7 +1,3 @@
-## 一键安装
-
-curl -fsSL https://raw.githubusercontent.com/jianmo0x00/darkin-releases/main/install.sh | sudo bash
-
 # DARKIN — AI 自主渗透测试系统
 
 从外网侦察到内网纵深的自主渗透平台。给定目标后由 AI Agent 自行完成
@@ -31,25 +27,92 @@ nuclei 模板（1.5 万+）、skills 库、部署脚本与文档全部在包内�
 
 ---
 
+## 获取安装包（三选一）
+
+**方式一：一键脚本（推荐）** —— 自动识别系统/架构，下载 + 校验 + 解压 + 安装：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/jianmo0x00/darkin-releases/main/install.sh | sudo bash
+```
+
+**方式二：GitHub 访问不畅时** —— 用 jsDelivr 加速获取脚本（国内通常可用）：
+
+```bash
+curl -fsSL https://cdn.jsdelivr.net/gh/jianmo0x00/darkin-releases@main/install.sh | sudo bash
+```
+
+一键脚本内部对安装包下载同样做了多源回退（自建镜像 → GitHub → 国内加速代理）。
+有自建镜像时可指定：`DARKIN_DL_BASE=https://你的镜像路径`。
+
+**方式三：手动离线安装** —— 在本页下方 Assets 下载对应平台的 zip（可通过任意
+渠道传输），上传服务器后：
+
+```bash
+unzip darkin-0.8.1-linux-amd64.zip
+cd darkin-0.8.1-linux-amd64
+chmod +x *.sh darkin
+sudo ./install-deps.sh
+```
+
+校验：比对本页 Assets 里的 `SHA256SUMS`。
+
+---
+
 ## 安装
 
-通用前提：**PostgreSQL 16 或 18**（本机 / 远程 / 容器均可）+ 一个 LLM API Key。
-
-### Windows
-
-1. 解压 zip 到任意目录（路径避免中文）
-2. 安装 PostgreSQL（或用已有的远程库）
-3. 双击 `启动DARKIN.bat`（或 `start.bat`）
+**不需要 Go / Node / 源码编译** —— 二进制和前端都在包里。
+唯一必须自己准备的是 **PostgreSQL 16 或 18**（本机 / 远程 / 容器均可），
+外加一个 LLM API Key（进入面板后填）。
 
 ### Linux
 
 ```bash
 unzip darkin-0.8.1-linux-amd64.zip
 cd darkin-0.8.1-linux-amd64
-chmod +x start.sh darkin *.sh
-./install-deps.sh    # 可选：安装系统依赖与 Python 工具环境
-./start.sh
+chmod +x *.sh darkin
+./install-deps.sh    # 一条命令完成安装 + 启动
 ```
+
+`install-deps.sh` 是交互式一键安装：安装并启动 PostgreSQL、创建 `artex`
+数据库、准备 Python 工具环境（impacket/sqlmap/pypykatz 等）、安装 Node 20
+（browser MCP 用）、配置 Chromium 与 nuclei 模板，然后询问访问方式：
+
+```
+1) 仅内网 / 本机    （局域网可直接访问，无伪装闸门）
+2) 开放外网         （默认开启反测绘闸门：必须用入口路径+口令访问）
+```
+
+选择后自动安装为 **systemd 系统服务并立即启动**（开机自启、崩溃自动拉起），
+脚本结尾直接打印访问地址。外网模式下访问地址形如
+`http://<IP>:8787/DARKIN-xxxxxxxx`，未带入口路径的请求一律返回假 nginx 页。
+
+已有远程数据库可跳过脚本，直接手写 `config.json` 后运行 `./start.sh`。
+
+### Windows
+
+**一键安装（PowerShell，Win10/11 自带）**：
+
+```powershell
+powershell -ExecutionPolicy Bypass -c "irm https://raw.githubusercontent.com/jianmo0x00/darkin-releases/main/install.ps1 | iex"
+```
+
+GitHub 访问不畅时改用 jsDelivr：
+
+```powershell
+powershell -ExecutionPolicy Bypass -c "irm https://cdn.jsdelivr.net/gh/jianmo0x00/darkin-releases@main/install.ps1 | iex"
+```
+
+脚本自动完成：下载解压到 `%USERPROFILE%\DARKIN` → SHA256 校验 →
+检测 PostgreSQL（未安装且系统有 winget 时可自动安装）→ 打印启动步骤。
+
+**手动安装**：
+
+1. 解压 zip 到任意目录（路径避免中文）
+2. 安装 [PostgreSQL 16/18](https://www.postgresql.org/download/windows/)（或用远程库）
+3. 复制 `config.example.json` 为 `config.json` 填连接信息
+4. 双击 `启动DARKIN.bat`
+
+包内已带 Python 3.13 与全部工具，无需额外安装。
 
 ### macOS
 
@@ -57,12 +120,14 @@ chmod +x start.sh darkin *.sh
 unzip darkin-0.8.1-macos-arm64.zip
 cd darkin-0.8.1-macos-arm64
 chmod +x start.sh darkin *.sh
+brew install postgresql@16 && brew services start postgresql@16
+createdb artex
 ./start.sh
 ```
 
 首次运行如被 Gatekeeper 拦截：`xattr -dr com.apple.quarantine .` 后重试。
 
-### 数据库配置
+### 数据库配置（非 install-deps.sh 方式时）
 
 复制 `config.example.json` 为 `config.json`，填 PostgreSQL 连接：
 
